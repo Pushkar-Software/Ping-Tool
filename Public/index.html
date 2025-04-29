@@ -1,26 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Ping Dashboard</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ping Status Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    body { font-family: Arial; padding: 20px; }
-    table { border-collapse: collapse; margin-top: 20px; }
-    td, th { border: 1px solid #ccc; padding: 8px; }
-    .online { color: green; }
-    .offline { color: red; }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 2rem;
+      color: #333;
+    }
+    .container {
+      max-width: 1000px;
+      margin: auto;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 2rem;
+      font-weight: 600;
+    }
+    .dashboard {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .card {
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 1.5rem;
+      flex: 1;
+      min-width: 300px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    th, td {
+      padding: 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    th {
+      background: #f0f0f0;
+      font-weight: 600;
+    }
+    .online {
+      color: #27ae60;
+      font-weight: 600;
+    }
+    .offline {
+      color: #c0392b;
+      font-weight: 600;
+    }
+    .refresh-info {
+      text-align: center;
+      margin-top: 1rem;
+      color: #888;
+      font-size: 0.9rem;
+    }
   </style>
 </head>
 <body>
-  <h2>Live Ping Dashboard</h2>
-  <canvas id="statusChart" width="400" height="200"></canvas>
-  <table id="statusTable">
-    <thead>
-      <tr><th>IP Address</th><th>Status</th></tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <div class="container">
+    <h2>✨ Live Ping Status Dashboard</h2>
+    <div class="dashboard">
+      <div class="card">
+        <h3>Status Chart</h3>
+        <canvas id="statusChart" width="400" height="400"></canvas>
+      </div>
+      <div class="card">
+        <h3>System Status Table</h3>
+        <table id="statusTable">
+          <thead>
+            <tr>
+              <th>IP Address</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div class="refresh-info">Auto-refreshes every 10 seconds</div>
+      </div>
+    </div>
+  </div>
 
   <script>
     async function fetchStatus() {
@@ -52,8 +125,16 @@
           labels: ['Online', 'Offline'],
           datasets: [{
             data: [online, offline],
-            backgroundColor: ['green', 'red']
+            backgroundColor: ['#27ae60', '#c0392b']
           }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            }
+          }
         }
       });
     }
