@@ -3,13 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ping Status Dashboard</title>
+  <title>Shared Ping Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
       font-family: 'Inter', sans-serif;
       background: #f4f6f8;
@@ -17,15 +15,8 @@
       padding: 2rem;
       color: #333;
     }
-    .container {
-      max-width: 1000px;
-      margin: auto;
-    }
-    h2 {
-      text-align: center;
-      margin-bottom: 2rem;
-      font-weight: 600;
-    }
+    .container { max-width: 1000px; margin: auto; }
+    h2 { text-align: center; margin-bottom: 2rem; font-weight: 600; }
     .dashboard {
       display: flex;
       flex-wrap: wrap;
@@ -51,18 +42,9 @@
       text-align: left;
       border-bottom: 1px solid #e0e0e0;
     }
-    th {
-      background: #f0f0f0;
-      font-weight: 600;
-    }
-    .online {
-      color: #27ae60;
-      font-weight: 600;
-    }
-    .offline {
-      color: #c0392b;
-      font-weight: 600;
-    }
+    th { background: #f0f0f0; font-weight: 600; }
+    .online { color: #27ae60; font-weight: 600; }
+    .offline { color: #c0392b; font-weight: 600; }
     .refresh-info {
       text-align: center;
       margin-top: 1rem;
@@ -73,7 +55,7 @@
 </head>
 <body>
   <div class="container">
-    <h2>✨ Live Ping Status Dashboard</h2>
+    <h2 id="dashboardTitle">📡 Shared Ping Dashboard</h2>
     <div class="dashboard">
       <div class="card">
         <h3>Status Chart</h3>
@@ -83,10 +65,7 @@
         <h3>System Status Table</h3>
         <table id="statusTable">
           <thead>
-            <tr>
-              <th>IP Address</th>
-              <th>Status</th>
-            </tr>
+            <tr><th>Location</th><th>IP Address</th><th>Status</th></tr>
           </thead>
           <tbody></tbody>
         </table>
@@ -94,30 +73,25 @@
       </div>
     </div>
   </div>
-
   <script>
+    let chart;
+    let groupId = window.location.pathname.split("/").pop();
     async function fetchStatus() {
-      const res = await fetch('/status');
+      const res = await fetch(`/status/${groupId}`);
       return await res.json();
     }
-
-    let chart;
     async function updateDashboard() {
       const data = await fetchStatus();
       const tbody = document.querySelector("#statusTable tbody");
       tbody.innerHTML = "";
-
       let online = 0, offline = 0;
-
-      for (let [ip, status] of Object.entries(data)) {
+      for (let [ip, info] of Object.entries(data)) {
         let row = document.createElement("tr");
-        row.innerHTML = `<td>${ip}</td><td class="${status.toLowerCase()}">${status}</td>`;
+        row.innerHTML = `<td>${info.location || "-"}</td><td>${ip}</td><td class="${info.status.toLowerCase()}">${info.status}</td>`;
         tbody.appendChild(row);
-        if (status === "Online") online++;
+        if (info.status === "Online") online++;
         else offline++;
       }
-
-      // Update Chart
       if (chart) chart.destroy();
       chart = new Chart(document.getElementById("statusChart"), {
         type: 'pie',
@@ -130,15 +104,10 @@
         },
         options: {
           responsive: true,
-          plugins: {
-            legend: {
-              position: 'bottom'
-            }
-          }
+          plugins: { legend: { position: 'bottom' } }
         }
       });
     }
-
     setInterval(updateDashboard, 10000);
     updateDashboard();
   </script>
